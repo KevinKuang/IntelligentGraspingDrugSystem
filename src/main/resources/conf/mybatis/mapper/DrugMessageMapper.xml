@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.edu.cqupt.nmid.igds.dao.mybatis.DrugMessageMapper">
+    <select id="getDrugList" resultType="Drug" parameterType="Page">
+        SELECT chinese_name,english_name,image_path
+        FROM igds_durg_message
+        <where>
+            <if test="searchString!=null and !&quot;&quot;.equals(searchString.trim())">
+                AND chinese_name LIKE "%"#{searchString}"%"
+            </if>
+        </where>
+        ORDER BY chinese_name
+        LIMIT #{page.dbIndex},#{page.dbNumber}
+    </select>
+
+    <select id="getDrugCount" resultType="int">
+        select
+        COUNT(*)
+        from igds_durg_message
+        <where>
+            <if test="searchString!=null and !&quot;&quot;.equals(searchString.trim())">
+                title LIKE "%"#{searchString}"%"
+            </if>
+        </where>
+    </select>
+
+    <select id="getDrugByName" resultType="Drug">
+        SELECT chinese_name,english_name,category,image_path,introduction,morphological_character,growth_habit,medicinal_value
+        FROM igds_durg_message
+        WHERE chinese_name=#{chineseName}
+    </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.edu.cqupt.nmid.igds.dao.mybatis.LinkMapper">
+    <insert id="saveLink" parameterType="Link">
+        insert into
+        igds_link(doctor_id,patient_id)
+        values
+        (#{doctorId},#{patientId});
+    </insert>
+
+    <select id="getLinkCount" resultType="int">
+        SELECT COUNT(*)
+         FROM igds_link
+         <where>
+             <if test="doctorId!=null and !&quot;&quot;.equals(doctorId.trim())">
+                  doctor_id=#{doctorId}
+             </if>
+             <if test="patientId!=null and !&quot;&quot;.equals(patientId.trim())">
+                   AND patient_id=#{patientId}
+             </if>
+         </where>
+    </select>
+
+    <delete id="deleteLink" parameterType="Link">
+        DELETE FROM igds_link WHERE doctor_id=#{doctorId} AND patient_id=#{patientId}
+    </delete>
+
+    <select id="getLinkList" resultType="Link" parameterType="Page">
+        SELECT doctor_id,patient_id
+        FROM igds_link
+        WHERE doctor_id=#{doctorId}
+        LIMIT #{page.dbIndex},#{page.dbNumber}
+    </select>
+</mapper>

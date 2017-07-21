@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.edu.cqupt.nmid.igds.dao.mybatis.UserInfoMapper">
+    <insert id="saveUser" useGeneratedKeys="true" keyProperty="id" parameterType="User">
+        insert into
+        igds_user_info(id_string,nick_name,password,phone_number,type)
+        values
+        (#{nickName},#{nickName},#{password},#{phoneNumber},#{type});
+    </insert>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE igds_user_info
+        <set>
+            <trim suffixOverrides=",">
+                <if test="idString!=null and !&quot;&quot;.equals(idString.trim())">
+                    id_string=#{idString},
+                </if>
+                <if test="nickName!=null and !&quot;&quot;.equals(nickName.trim())">
+                    nick_name=#{nickName},
+                </if>
+                <if test="password!=null and !&quot;&quot;.equals(password.trim())">
+                    password=#{password},
+                </if>
+                <if test="phoneNumber!=null and !&quot;&quot;.equals(phoneNumber.trim())">
+                    phone_number=#{phoneNumber},
+                </if>
+                <if test="type!=null and !&quot;&quot;.equals(type.trim())">
+                    type=#{type},
+                </if>
+            </trim>
+            WHERE id=#{id}
+        </set>
+    </update>
+
+    <select id="getUser" resultType="User">
+        select
+        id,id_string,nick_name,password,phone_number,type
+        from igds_user_info
+        <where>
+            <if test="idString!=null and !&quot;&quot;.equals(idString.trim())">
+                id_string=#{idString}
+            </if>
+            <if test="phoneNumber!=null and !&quot;&quot;.equals(phoneNumber.trim())">
+                phone_number=#{phoneNumber}
+            </if>
+        </where>
+    </select>
+
+    <select id="checkUser"  resultType="int">
+        SELECT  COUNT(*)
+        FROM igds_user_info
+        <where>
+            <if test="idString!=null and !&quot;&quot;.equals(idString.trim())">
+                id_string=#{idString}
+            </if>
+            <if test="phoneNumber!=null and !&quot;&quot;.equals(phoneNumber.trim())">
+                phone_number=#{phoneNumber}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUserList" resultType="User">
+        select id_string,nick_name,phone_number,type
+        FROM igds_user_info
+        WHERE id_string IN
+        <foreach collection="idList" item="userId" index="index" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </select>
+</mapper>
