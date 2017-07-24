@@ -107,8 +107,9 @@ public class LinkServiceImpl implements LinkService{
         WebLink webLink = new WebLink(link);
         User patient = userInfoDao.getUser(null,link.getPatientId());
         webLink.setPatient(new WebUser(patient));
+        webLink.setDoctor(new WebUser(doctor));
         ResponseJson response = new ResponseJson(CREATED);
-        response.setBody(link);
+        response.setBody(webLink);
         return response;
     }
 
