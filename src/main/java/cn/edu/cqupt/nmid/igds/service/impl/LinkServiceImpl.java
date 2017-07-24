@@ -138,6 +138,7 @@ public class LinkServiceImpl implements LinkService{
                     return new ResponseJson(UNAUTHORIZED);
                 }
                 link.setDoctorId(userId);
+                link.setStatus(status);
                 int totalCount = this.linkDao.getLinkCount(link);
                 Page page = PageUtil.getPageOfObject(currentPage, totalCount, PageConstant.LINK.getPageNumber());
                 List<WebLink> webLinkList = new ArrayList<>();
@@ -154,6 +155,7 @@ public class LinkServiceImpl implements LinkService{
             }
             case PATIENT: {
                 link.setPatientId(userId);
+                link.setStatus(status);
                 int totalCount = this.linkDao.getLinkCount(link);
                 Page page = PageUtil.getPageOfObject(currentPage, totalCount, PageConstant.LINK.getPageNumber());
                 List<WebLink> webLinkList = new ArrayList<>();
