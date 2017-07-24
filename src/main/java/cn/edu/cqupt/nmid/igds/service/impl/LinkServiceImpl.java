@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
-import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConsta.HISTORY;
-import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConsta.LINKING;
+import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConstant.HISTORY;
+import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConstant.LINKING;
 import static cn.edu.cqupt.nmid.igds.constant.StatusCodeConstant.*;
 import static cn.edu.cqupt.nmid.igds.constant.UserTypeConstant.*;
 import static cn.edu.cqupt.nmid.igds.util.QRCodeUtil.createQR;
