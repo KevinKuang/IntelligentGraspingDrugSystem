@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
 <mapper namespace="cn.edu.cqupt.nmid.igds.dao.mybatis.LinkMapper">
-    <insert id="saveLink" parameterType="Link">
+    <insert id="saveLink" useGeneratedKeys="true" keyProperty="id"  parameterType="Link">
         insert into
         igds_link(doctor_id,patient_id)
         values
@@ -19,17 +19,32 @@
              <if test="patientId!=null and !&quot;&quot;.equals(patientId.trim())">
                    AND patient_id=#{patientId}
              </if>
+             <if test="status!=null and !&quot;&quot;.equals(status.trim())">
+                 AND status=#{status}
+             </if>
          </where>
     </select>
 
-    <delete id="deleteLink" parameterType="Link">
-        DELETE FROM igds_link WHERE doctor_id=#{doctorId} AND patient_id=#{patientId}
-    </delete>
+    <update id="cancelLink" parameterType="Link">
+        UPDATE igds_link
+        SET status = 'history'
+        WHERE doctor_id = #{doctorId} AND patient_id = #{patientId}
+    </update>
 
     <select id="getLinkList" resultType="Link" parameterType="Page">
-        SELECT doctor_id,patient_id
+        SELECT id,doctor_id,patient_id,status
         FROM igds_link
-        WHERE doctor_id=#{doctorId}
+        <where>
+            <if test="doctorId!=null and !&quot;&quot;.equals(doctorId.trim())">
+                doctor_id=#{doctorId}
+            </if>
+            <if test="patientId!=null and !&quot;&quot;.equals(patientId.trim())">
+                AND patient_id=#{patientId}
+            </if>
+            <if test="status!=null and !&quot;&quot;.equals(status.trim())">
+                AND status=#{status}
+            </if>
+        </where>
         LIMIT #{page.dbIndex},#{page.dbNumber}
     </select>
 </mapper>

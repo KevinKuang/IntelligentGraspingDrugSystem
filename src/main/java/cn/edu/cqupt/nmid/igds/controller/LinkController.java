@@ -45,8 +45,8 @@ public class LinkController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/cancle",method = RequestMethod.POST)
-    public ResponseJson cancle (
+    @RequestMapping(value = "/cancel",method = RequestMethod.POST)
+    public ResponseJson cancel (
             @Param("doctorId") String doctorId,
             @Param("patientId") String patientId
     ){
@@ -59,9 +59,11 @@ public class LinkController {
     @ResponseBody
     @RequestMapping(value = "list",method = RequestMethod.POST)
     public ResponseJson getList(
-            @Param("doctorId") String doctorId,
-            @Param("currentPage") int currentPage
+            @Param("userId") String userId,
+            @Param("currentPage") int currentPage,
+            @Param("type") String type,
+            @Param("status") String status
     ){
-        return this.linkService.getLinks(doctorId,currentPage);
+        return this.linkService.getLinks(userId,type,status,currentPage);
     }
 }

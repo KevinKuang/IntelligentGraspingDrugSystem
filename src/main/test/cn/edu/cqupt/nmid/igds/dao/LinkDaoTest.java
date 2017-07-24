@@ -22,7 +22,7 @@ public class LinkDaoTest {
         link.setDoctorId("dasdsa");
         link.setPatientId("hjkhk");
         System.out.println(linkDao.getLinkCount(link));
-        linkDao.deleteLink(link);
+        linkDao.cancelLink(link);
     }
 
 }

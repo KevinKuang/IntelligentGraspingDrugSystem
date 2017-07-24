@@ -20,6 +20,6 @@ public interface LinkService {
 
     public ResponseJson cancelLink (Link link);
 
-    public ResponseJson getLinks (String doctorId, int currentPage);
+    public ResponseJson getLinks (String userId, String type,String status,int currentPage);
 
 }

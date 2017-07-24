@@ -16,7 +16,10 @@ public interface LinkDao {
 
     int getLinkCount(Link link);
 
-    int deleteLink (Link link);
+    int cancelLink (Link link);
 
-    List<Link> getLinkList(@Param("doctorId") String doctorId,@Param("page") Page page);
+    List<Link> getLinkList(@Param("doctorId") String doctorId,
+                           @Param("patientId") String patientId,
+                           @Param("status")String status,
+                           @Param("page") Page page);
 }

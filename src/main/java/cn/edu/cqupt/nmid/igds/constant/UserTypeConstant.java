@@ -3,20 +3,9 @@ package cn.edu.cqupt.nmid.igds.constant;
 /**
  * Created by Administrator on 2017/7/8.
  */
-public enum UserTypeConstant {
-    DOCTOR("doctor"),
-    PATIENT("patient"),
-    TOURIST("tourist");
-    private String type;
-    public String getType() {
-        return type;
-    }
+public class UserTypeConstant {
+    public final static String DOCTOR = "doctor";
+    public final static String PATIENT = "patient";
+    public final static String TOURIST = "tourist";
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    private UserTypeConstant(String type) {
-        this.type = type;
-    }
 }

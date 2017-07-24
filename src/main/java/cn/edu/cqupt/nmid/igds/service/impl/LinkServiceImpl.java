@@ -5,11 +5,11 @@ import cn.edu.cqupt.nmid.igds.dao.LinkDao;
 import cn.edu.cqupt.nmid.igds.dao.UserInfoDao;
 import cn.edu.cqupt.nmid.igds.model.Link;
 import cn.edu.cqupt.nmid.igds.model.User;
+import cn.edu.cqupt.nmid.igds.model.WebLink;
 import cn.edu.cqupt.nmid.igds.model.WebUser;
 import cn.edu.cqupt.nmid.igds.model.json.ResponseJson;
 import cn.edu.cqupt.nmid.igds.model.page.Page;
 import cn.edu.cqupt.nmid.igds.service.LinkService;
-import cn.edu.cqupt.nmid.igds.service.util.EncodeAndDecodeUtil;
 import cn.edu.cqupt.nmid.igds.util.PageUtil;
 import cn.edu.cqupt.nmid.igds.util.ResponseHandelUtil;
 import com.google.zxing.WriterException;
@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
+import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConsta.HISTORY;
+import static cn.edu.cqupt.nmid.igds.constant.LinkStatusConsta.LINKING;
 import static cn.edu.cqupt.nmid.igds.constant.StatusCodeConstant.*;
 import static cn.edu.cqupt.nmid.igds.constant.UserTypeConstant.*;
 import static cn.edu.cqupt.nmid.igds.util.QRCodeUtil.createQR;
@@ -94,20 +96,26 @@ public class LinkServiceImpl implements LinkService{
             return new ResponseJson(NOT_FOUND);
         }
         User doctor = this.userInfoDao.getUser(null,link.getDoctorId());
-        if(!DOCTOR.getType().equals(doctor.getType())){
+        if(!DOCTOR.equals(doctor.getType())){
             return new ResponseJson(UNAUTHORIZED);
         }
+        link.setStatus(LINKING);
         if(this.linkDao.getLinkCount(link)>0){
             return new ResponseJson(FORBIDDEN);
         }
         this.linkDao.saveLink(link);
-        return new ResponseJson(CREATED);
+        WebLink webLink = new WebLink(link);
+        User patient = userInfoDao.getUser(null,link.getPatientId());
+        webLink.setPatient(new WebUser(patient));
+        ResponseJson response = new ResponseJson(CREATED);
+        response.setBody(link);
+        return response;
     }
 
     @Override
     public ResponseJson cancelLink(Link link) {
         if(this.linkDao.getLinkCount(link)>0){
-            this.linkDao.deleteLink(link);
+            this.linkDao.cancelLink(link);
             return new ResponseJson(NO_CONTENT);
         }else{
             return new ResponseJson(GONE);
@@ -115,33 +123,53 @@ public class LinkServiceImpl implements LinkService{
     }
 
     @Override
-    public ResponseJson getLinks(String doctorId, int currentPage) {
-        if(this.userInfoDao.checkUser(null,doctorId)==0){
+    public ResponseJson getLinks(String userId,String type,String status, int currentPage) {
+        if(this.userInfoDao.checkUser(null,userId)==0){
             return new ResponseJson(NOT_FOUND);
         }
-        Link link  = new Link();
-        link.setDoctorId(doctorId);
-        int totalCount = this.linkDao.getLinkCount(link);
-        Page page = PageUtil.getPageOfObject(currentPage,totalCount, PageConstant.LINK.getPageNumber());
-        List<WebUser> webUserList = new ArrayList<>();
-        if(totalCount>0){
-            List<Link> linkList = this.linkDao.getLinkList(doctorId,page);
-            List<String> idList = new ArrayList<>();
-            for (Link linkOfList :linkList) {
-                idList.add(linkOfList.getPatientId());
-            }
-            List<User> userList = this.userInfoDao.getUserList(idList);
-
-            for (User user : userList) {
-                try {
-                    user = EncodeAndDecodeUtil.encodeUser(user);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return new ResponseJson(UNPROCESABLE_ENTITY);
-                }
-                webUserList.add(new WebUser(user));
-            }
+        if(status!=null&&!"".equals(status)&&!LINKING.equals(status)&&!HISTORY.equals(status)){
+            return new ResponseJson(INVALID_REQUEST);
         }
-        return ResponseHandelUtil.listHandel(webUserList,page);
+        Link link  = new Link();
+        switch (type){
+            case DOCTOR: {
+                User doctor = userInfoDao.getUser(null,userId);
+                if(!DOCTOR.equals(doctor.getType())){
+                    return new ResponseJson(UNAUTHORIZED);
+                }
+                link.setDoctorId(userId);
+                int totalCount = this.linkDao.getLinkCount(link);
+                Page page = PageUtil.getPageOfObject(currentPage, totalCount, PageConstant.LINK.getPageNumber());
+                List<WebLink> webLinkList = new ArrayList<>();
+                if (totalCount > 0) {
+                    List<Link> linkList = this.linkDao.getLinkList(userId,null,status, page);
+                    for (Link eachLink : linkList) {
+                        WebLink webLink = new WebLink(eachLink);
+                        WebUser patient = new WebUser(userInfoDao.getUser(null, eachLink.getPatientId()));
+                        webLink.setPatient(patient);
+                        webLinkList.add(webLink);
+                    }
+                }
+                return ResponseHandelUtil.listHandel(webLinkList,page);
+            }
+            case PATIENT: {
+                link.setPatientId(userId);
+                int totalCount = this.linkDao.getLinkCount(link);
+                Page page = PageUtil.getPageOfObject(currentPage, totalCount, PageConstant.LINK.getPageNumber());
+                List<WebLink> webLinkList = new ArrayList<>();
+                if (totalCount > 0) {
+                    List<Link> linkList = this.linkDao.getLinkList(null,userId,status,page);
+                    for (Link eachLink : linkList) {
+                        WebLink webLink = new WebLink(eachLink);
+                        WebUser doctor = new WebUser(userInfoDao.getUser(null, eachLink.getDoctorId()));
+                        webLink.setDoctor(doctor);
+                        webLinkList.add(webLink);
+                    }
+                }
+                return ResponseHandelUtil.listHandel(webLinkList,page);
+            }
+            default:
+                return new ResponseJson(INVALID_REQUEST);
+        }
     }
 }
