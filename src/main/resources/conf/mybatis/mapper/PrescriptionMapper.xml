@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="cn.edu.cqupt.nmid.igds.dao.mybatis.PrescriptionMapper">
+    <insert id="savePrescription" parameterType="Prescription">
+        INSERT INTO
+        igds_prescription (link_id,drug_name,dose)
+        VALUES
+        <foreach collection="drugs"  item="drug" open="(" close=")" separator="),(">
+            #{linkId},#{drug.drugName},#{drug.dose}
+        </foreach>
+    </insert>
+
+    <select id="getPrescription" resultType="DrugDose">
+        SELECT drug_name , dose
+        FROM igds_prescription
+        WHERE link_id = #{linkId}
+    </select>
+</mapper>
